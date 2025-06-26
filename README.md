@@ -1,4 +1,4 @@
-# 🚀 FreeSeekR1-Agent: Your Autonomous AI Assistant for Termux 🐳 + 🦜 = 🔥
+# 🚀 FreeSeekR1-Agent: Your Autonomous AI Assistant for Termux 📱 + 🐳 + 🦜 = 🔥
 
 ## Unleash the Power of AI, Totally free and Recursively! ✨
 
