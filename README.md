@@ -1,6 +1,6 @@
 # 🚀 FreeSeekR1-Agent: Your Autonomous AI Assistant for Termux 🤖
 
-## Unleash the Power of AI, Locally and Recursively! ✨
+## Unleash the Power of AI, Totally free and Recursively! ✨
 
 FreeSeekR1-Agent is a cutting-edge AI assistant designed to operate seamlessly within your Termux environment. This intelligent agent is built to tackle a wide array of tasks by **recursively answering and executing function calls until your objective is fully achieved!** Say goodbye to manual intervention and let FreeSeekR1-Agent drive your productivity.
 
@@ -55,7 +55,7 @@ FreeSeekR1-Agent comes packed with a versatile suite of tools to help you get th
     *   Searches for data within Wikidata based on your query.
 
 ### 🚀 Get Started:                                                                                       
-To begin your journey with FreeSeekR1-Agent, simply run the `ai.py` script in your Termux environment. Ensure you have `config.json` set up (even if empty for DeepSeek API, as it's configured to use a `base_url` that doesn't require a key).
+To begin your journey with FreeSeekR1-Agent, simply run the `ai.py` script in your Termux environment.
 
 ```bash
 python ai.py
