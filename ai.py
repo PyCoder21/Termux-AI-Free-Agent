@@ -171,7 +171,7 @@ def create_image(prompt: str, filename: str) -> str:
 
 @tool
 def duckduckgo(query: str) -> str:
-    """Выполняет поиск в DuckDuckGo для получения актуальной информации."""
+    """Выполняет поиск в DuckDuckGo для получения актуальной информации. Возвращает результаты с ссылками"""
     try:
         return SEARCH_TOOL.invoke(query)
     except Exception as e:
@@ -301,6 +301,15 @@ def query_wikidata(query: str) -> str:
     except Exception as e:
         return f"Ошибка поиска в Wikidata: {e}"
 
+@tool
+def open_url(url):
+    """Открывает URL на телефоне пользователя"""
+    res = subprocess.run(["termux-open-url", url], capture_output=True, text=True, check=True)
+    if res.returncode == 0:
+        return f"{url} был успешно открыт"
+    else:
+        return f"Ошибка: {res.stderr}"
+
 
 # ==============================================================================
 # 4. Обработка вывода и вызовов инструментов
@@ -417,7 +426,7 @@ def main():
     tools = [
         run_command, read_file, write_file, edit_file, wikipedia, create_image,
         duckduckgo, get_weather_data, stackoverflow, calculator, solve_equation,
-        scrape_webpage, get_git_repo, query_wikidata
+        scrape_webpage, get_git_repo, query_wikidata, open_url
     ]
     chain = create_llm_chain(CONFIG, tools)
     chat_history = []
