@@ -380,7 +380,7 @@ def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[To
 # 5. Основной цикл приложения (CLI)
 # ==============================================================================
 
-def create_llm_chain(config: Dict[str, Any], tools: List) -> Any:
+def create_llm_chain(config: Dict[str, Any], tools: List, is_interactive_mode: bool) -> Any:
     """Создает и настраивает цепочку LLM с инструментами."""
     llm = ChatOpenAI(
         api_key=config.get("api_key"),
@@ -402,6 +402,12 @@ def create_llm_chain(config: Dict[str, Any], tools: List) -> Any:
 - **Не выдумывай:** Если не знаешь, как что-то сделать, используй поисковые инструменты.
 """
     
+    if not is_interactive_mode:
+        system_prompt += """
+
+ВНИМАНИЕ: Ты находишься в НЕИНТЕРАКТИВНОМ режиме. Ты ДОЛЖЕН выполнить задачу полностью, не ожидая уточнений от пользователя. Если ты не знаешь, как поступить, выбери наиболее подходящий вариант и продолжи выполнение. НЕ ЗАДАВАЙ ВОПРОСОВ.
+"""
+    
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
         MessagesPlaceholder(variable_name="messages")
@@ -412,35 +418,54 @@ def create_llm_chain(config: Dict[str, Any], tools: List) -> Any:
 
 def main():
     """Главная функция, запускающая CLI."""
+    import sys
+
+    is_interactive_mode = not (len(sys.argv) > 1)
+    initial_query = " ".join(sys.argv[1:]) if not is_interactive_mode else None
+
     console.print(Panel.fit(
         "[bold magenta]🤖 AI Ассистент для Termux[/]",
         subtitle="[cyan]📱 + 🐳 + 🦜 = 🔥[/]",
         border_style="blue"
     ))
-    console.print("[dim]Введите 'exit' или нажмите Ctrl+D для выхода.[/]")
 
-    session = PromptSession(
-        history=FileHistory('.assistant_history'),
-        auto_suggest=AutoSuggestFromHistory(),
-        lexer=PygmentsLexer(BashLexer),
-        style=Style.from_dict({'prompt': 'bold ansigreen', 'input': 'bold'})
-    )
+    if is_interactive_mode:
+        console.print("[dim]Введите 'exit' или нажмите Ctrl+D для выхода.[/]")
+        session = PromptSession(
+            history=FileHistory('.assistant_history'),
+            auto_suggest=AutoSuggestFromHistory(),
+            lexer=PygmentsLexer(BashLexer),
+            style=Style.from_dict({'prompt': 'bold ansigreen', 'input': 'bold'})
+        )
+    else:
+        console.print("[bold yellow]Запущен неинтерактивный режим.[/]")
+        console.print("[dim]Задача будет выполнена без запросов к пользователю.[/]")
+        session = None # В неинтерактивном режиме сессия не нужна
 
     tools = [
         run_command, read_file, write_file, edit_file, wikipedia, create_image,
         duckduckgo, get_weather_data, stackoverflow, calculator, solve_equation,
         scrape_webpage, get_git_repo, query_wikidata, open_url
     ]
-    chain = create_llm_chain(CONFIG, tools)
+    chain = create_llm_chain(CONFIG, tools, is_interactive_mode)
     chat_history = []
 
     while True:
         try:
-            user_input = session.prompt([('class:prompt', '[Ваш запрос] ➤ ')])
-            if user_input.lower().strip() in ('exit', 'quit', 'q'):
-                break
-            if not user_input.strip():
-                continue
+            if is_interactive_mode:
+                user_input = session.prompt([('class:prompt', '[Ваш запрос] ➤ ')])
+                if user_input.lower().strip() in ('exit', 'quit', 'q'):
+                    break
+                if not user_input.strip():
+                    continue
+            else:
+                user_input = initial_query
+                if not user_input:
+                    console.print("[bold red]Ошибка: В неинтерактивном режиме требуется запрос.[/]")
+                    break
+                console.print(f"[bold green]Запрос:[/][cyan] {user_input}[/]")
+                # Выполняем только один раз в неинтерактивном режиме
+                initial_query = None 
 
             console.print("-" * 50)
             chat_history.append(HumanMessage(content=user_input))
@@ -450,10 +475,6 @@ def main():
                 console.print(f"[bold yellow]Итерация {i+1}/{max_iterations}...[/]")
                 
                 try:
-                    # Перед этим блоком:
-                    # response = chain.invoke(...)
-
-                    # Добавьте:
                     context_percent = calculate_context_usage(chat_history)
                     console.print(f"[dim]Контекст: [green]{context_percent:.1f}%[/] заполнен[/]")
                     bar_length = 20
@@ -481,6 +502,9 @@ def main():
                     break
             else:
                 console.print(Panel("[bold yellow]⚠ Достигнут лимит итераций. Если задача не решена, попробуйте переформулировать запрос.[/]", border_style="yellow"))
+
+            if not is_interactive_mode:
+                break # Выход после выполнения запроса в неинтерактивном режиме
 
         except (KeyboardInterrupt, EOFError):
             break
