@@ -402,7 +402,7 @@ def main():
     """Главная функция, запускающая CLI."""
     console.print(Panel.fit(
         "[bold magenta]🤖 AI Ассистент для Termux[/]",
-        subtitle="[cyan]🐳 + 🦜 = 🔥[/]",
+        subtitle="[cyan]📱 + 🐳 + 🦜 = 🔥[/]",
         border_style="blue"
     ))
     console.print("[dim]Введите 'exit' или нажмите Ctrl+D для выхода.[/]")
