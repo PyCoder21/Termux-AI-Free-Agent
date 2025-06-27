@@ -58,6 +58,12 @@ def load_config() -> Dict[str, Any]:
 
 CONFIG = load_config()
 
+
+def calculate_context_usage(messages: List) -> float:
+    """Вычисляет процент заполнения контекста (максимум 172800 символов)"""
+    total_chars = sum(len(msg.content) for msg in messages if hasattr(msg, 'content'))
+    return min(100.0, (total_chars / 172800) * 100)
+
 # ==============================================================================
 # 2. Инициализация API и оберток
 # ==============================================================================
@@ -118,28 +124,25 @@ def write_file(filepath: str, content: str, append: bool = False) -> str:
         return f"Ошибка записи в файл '{filepath}': {e}"
 
 @tool
-def edit_file(filepath: str, old_code: str, new_code: str) -> str:
-    """
-    Заменяет один фрагмент кода (old_code) на другой (new_code) в файле.
-    Эта функция требует точного совпадения `old_code`.
-    """
+def edit_file(filepath: str, old_snippet: str, new_snippet: str) -> str:
+    """заменяет фрагмент кода на другой в файле"""
     try:
-        content = read_file(filepath)
-        if "Ошибка:" in content:
-            return content # Возвращаем ошибку от read_file
+        # Читаем файл напрямую, без вызова через инструмент
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
 
-        if old_code not in content:
-            return f"Ошибка: Исходный фрагмент кода не найден в файле '{filepath}'."
+        if old_snippet not in content:
+            return f"Ошибка: Исходный фрагмент не найден в файле '{filepath}'"
 
-        new_content = content.replace(old_code, new_code, 1)
-        write_result = write_file(filepath, new_content)
+        new_content = content.replace(old_snippet, new_snippet, 1)
 
-        if "Ошибка:" in write_result:
-            return write_result
+        # Записываем файл напрямую
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(new_content)
 
-        return f"Файл '{filepath}' успешно отредактирован."
+        return f"Файл '{filepath}' успешно отредактирован"
     except Exception as e:
-        return f"Непредвиденная ошибка при редактировании файла: {e}"
+        return f"Ошибка редактирования: {str(e)}"
 
 @tool
 def wikipedia(query: str) -> str:
@@ -447,6 +450,16 @@ def main():
                 console.print(f"[bold yellow]Итерация {i+1}/{max_iterations}...[/]")
                 
                 try:
+                    # Перед этим блоком:
+                    # response = chain.invoke(...)
+
+                    # Добавьте:
+                    context_percent = calculate_context_usage(chat_history)
+                    console.print(f"[dim]Контекст: [green]{context_percent:.1f}%[/] заполнен[/]")
+                    bar_length = 20
+                    filled = int(bar_length * context_percent / 100)
+                    bar = '█' * filled + '░' * (bar_length - filled)
+                    console.print(f"[dim][{bar}] [green]{context_percent:.1f}%[/][/]")
                     response = chain.invoke(
                         {"messages": chat_history},
                         config=RunnableConfig(callbacks=[StreamingOutputHandler()])
