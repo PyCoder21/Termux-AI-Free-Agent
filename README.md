@@ -4,7 +4,7 @@
 
 FreeSeekR1-Agent is a cutting-edge LangChain 🦜 AI assistant designed to operate seamlessly within your Termux environment. This intelligent agent is built to tackle a wide array of tasks by **recursively answering and executing function calls until your objective is fully achieved!** Say goodbye to manual intervention and let FreeSeekR1-Agent drive your productivity.
 
-### 🖥️NEW!!!:
+### 🖥️ NEW!!!:
 
 - **Context compression:** If your context is full, you can use the `/compress` command to replace the dialog history with a detailed summary by DeepSeek.
 - **Context fullness indicator:** At the end of each response, there is an indicator showing the percentage of context fullness.
@@ -33,8 +33,10 @@ Here is the complete tool list:
 4.  **`edit_file(filepath: str, old_code: str, new_code: str)`**
     *   Replaces a specific code fragment (`old_code`) with new code (`new_code`) within a file. Requires exact matching of `old_code`.
 
-5.  **`wikipedia(query: str)`**                                                                         *   Searches for information on Wikipedia based on your query.
-                                                                                                    6.  **`create_image(prompt: str, filename: str)`**
+5.  **`wikipedia(query: str)`**
+    *   Searches for information on Wikipedia based on your query.
+
+6.  **`create_image(prompt: str, filename: str)`**
     *   Generates an image from a text description (prompt) and saves it to a file. Powered by Pollinations.
 
 7.  **`duckduckgo(query: str)`**
