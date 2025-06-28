@@ -28,8 +28,8 @@ Here is the complete tool list:
 4.  **`edit_file(filepath: str, old_code: str, new_code: str)`**
     *   Replaces a specific code fragment (`old_code`) with new code (`new_code`) within a file. Requires exact matching of `old_code`.
 
-5.  **`wikipedia(query: str)`**                                                                               *   Searches for information on Wikipedia based on your query.
-                                                                                                          6.  **`create_image(prompt: str, filename: str)`**
+5.  **`wikipedia(query: str)`**                                                                         *   Searches for information on Wikipedia based on your query.
+                                                                                                    6.  **`create_image(prompt: str, filename: str)`**
     *   Generates an image from a text description (prompt) and saves it to a file. Powered by Pollinations.
 
 7.  **`duckduckgo(query: str)`**
@@ -64,6 +64,12 @@ To begin your journey with FreeSeekR1-Agent, simply run the `ai.py` script in yo
 
 ```bash
 python ai.py
+```
+
+FreeSeekR1-Agent also has a non-interactive mode :
+
+```bash
+python ai.py "What is the weather in Paris today?"
 ```
 
 Start interacting with your new autonomous AI assistant today!

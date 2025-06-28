@@ -127,7 +127,6 @@ def write_file(filepath: str, content: str, append: bool = False) -> str:
 def edit_file(filepath: str, old_snippet: str, new_snippet: str) -> str:
     """заменяет фрагмент кода на другой в файле"""
     try:
-        # Читаем файл напрямую, без вызова через инструмент
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
 
@@ -136,7 +135,6 @@ def edit_file(filepath: str, old_snippet: str, new_snippet: str) -> str:
 
         new_content = content.replace(old_snippet, new_snippet, 1)
 
-        # Записываем файл напрямую
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(new_content)
 
@@ -288,7 +286,6 @@ def get_git_repo(url: str) -> str:
     except Exception as e:
         return f"Непредвиденная ошибка: {escape(str(e))}"
     finally:
-        # Очистка
         console.print("[yellow]Очистка временных файлов...[/]")
         if os.path.isdir(repo_dir):
             subprocess.run(["rm", "-rf", repo_dir])
@@ -328,7 +325,6 @@ def display_tool_call(tool_call: Dict[str, Any]):
     tool_args = tool_call['args']
     panel_content = f"[bold]Инструмент:[/][cyan]{tool_name}[/][bold]Аргументы:[/]"
     
-    # Используем Syntax для красивого отображения кода/аргументов
     args_str = json.dumps(tool_args, indent=2, ensure_ascii=False)
     panel_content += str(Syntax(args_str, "json", theme="monokai", line_numbers=True))
     
@@ -439,7 +435,7 @@ def main():
     else:
         console.print("[bold yellow]Запущен неинтерактивный режим.[/]")
         console.print("[dim]Задача будет выполнена без запросов к пользователю.[/]")
-        session = None # В неинтерактивном режиме сессия не нужна
+        session = None
 
     tools = [
         run_command, read_file, write_file, edit_file, wikipedia, create_image,
@@ -463,7 +459,6 @@ def main():
                     console.print("[bold red]Ошибка: В неинтерактивном режиме требуется запрос.[/]")
                     break
                 console.print(f"[bold green]Запрос:[/][cyan] {user_input}[/]")
-                # Выполняем только один раз в неинтерактивном режиме
                 initial_query = None 
 
             console.print("-" * 50)
@@ -489,7 +484,7 @@ def main():
                     console.print(escape(str(e)))
                     break
                 
-                console.print() # Новая строка после ответа модели
+                console.print()
                 
                 if response.tool_calls:
                     tool_messages = process_tool_calls(response.tool_calls, tools)
@@ -503,7 +498,7 @@ def main():
                 console.print(Panel("[bold yellow]⚠ Достигнут лимит итераций. Если задача не решена, попробуйте переформулировать запрос.[/]", border_style="yellow"))
 
             if not is_interactive_mode:
-                break # Выход после выполнения запроса в неинтерактивном режиме
+                break
 
         except (KeyboardInterrupt, EOFError):
             break
