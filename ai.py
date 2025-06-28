@@ -307,6 +307,15 @@ def open_url(url):
     else:
         return f"Ошибка: {res.stderr}"
 
+@tool
+def run_interactive_command(command):
+    """Выполняет команду полностью интерактивно, но без захвата вывода и ошибок"""
+    try:
+        os.system("command")
+        return "Command runned"
+    except Exception as e:
+        return f"Error: {e}"
+
 
 # ==============================================================================
 # 4. Обработка вывода и вызовов инструментов
@@ -391,6 +400,7 @@ def create_llm_chain(config: Dict[str, Any], tools: List, is_interactive_mode: b
 - **Координаты:** Для погоды используй широту и долготу, округленные до двух знаков после точки (например, 55.75, 37.62 для Москвы).
 - **Контекст Termux:** Помни, что ты работаешь в Termux. Адаптируй команды и пути к файлам под эту среду. При поиске ошибок в интернете, фокусируйся на общей части ошибки, а не на специфичных для Termux путях.
 - **Не выдумывай:** Если не знаешь, как что-то сделать, используй поисковые инструменты.
+- Используй run_interactive_command ТОЛЬКО если без этого не обойтись, так как нет перехвата ошибок, и это делает тебя менее автономным.    
 """
     
     if not is_interactive_mode:
@@ -474,7 +484,7 @@ def main():
     tools = [
         run_command, read_file, write_file, edit_file, wikipedia, create_image,
         duckduckgo, get_weather_data, stackoverflow, calculator, solve_equation,
-        scrape_webpage, get_git_repo, query_wikidata, open_url
+        scrape_webpage, get_git_repo, query_wikidata, open_url, run_interactive_command
     ]
     chain = create_llm_chain(CONFIG, tools, is_interactive_mode)
     chat_history = []
