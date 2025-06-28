@@ -7,7 +7,7 @@ FreeSeekR1-Agent is a cutting-edge LangChain 🦜 AI assistant designed to opera
 ### 🖥️NEW!!!:
 
 - **Context compression:** If your context is full, you can use the `/compress` command to replace the dialog history with a detailed summary by DeepSeek.
-- **Context fullness indicator:** At the end of each response, there is an indicator showing the percentage of context fulness.
+- **Context fullness indicator:** At the end of each response, there is an indicator showing the percentage of context fullness.
 
 ### 🌟 Key Features:                                                                                      
 -   **Autonomous Execution:** The agent intelligently breaks down complex tasks and executes a series of tool calls, iterating until the goal is met.
