@@ -58,11 +58,9 @@ def load_config() -> Dict[str, Any]:
 
 CONFIG = load_config()
 
-
-def calculate_context_usage(messages: List) -> float:
-    """Вычисляет процент заполнения контекста (максимум 172800 символов)"""
-    total_chars = sum(len(msg.content) for msg in messages if hasattr(msg, 'content'))
-    return min(100.0, (total_chars / 172800) * 100)
+# Максимальный размер контекста модели в токенах. 
+# Желательно установить значение, соответствующее вашей модели (например, 128000 для gpt-4-turbo)
+MAX_CONTEXT_TOKENS = 128000 
 
 # ==============================================================================
 # 2. Инициализация API и оберток
@@ -370,7 +368,6 @@ def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[To
             
     return tool_messages
 
-
 # ==============================================================================
 # 5. Основной цикл приложения (CLI)
 # ==============================================================================
@@ -444,10 +441,19 @@ def main():
     ]
     chain = create_llm_chain(CONFIG, tools, is_interactive_mode)
     chat_history = []
+    last_prompt_tokens = 0
 
     while True:
         try:
             if is_interactive_mode:
+                # Показываем заполненность контекста перед вводом
+                if last_prompt_tokens > 0:
+                    context_percent = min(100.0, (last_prompt_tokens / MAX_CONTEXT_TOKENS) * 100)
+                    bar_length = 20
+                    filled = int(bar_length * context_percent / 100)
+                    bar = '█' * filled + '░' * (bar_length - filled)
+                    console.print(f"[dim]Контекст: [{('green' if context_percent < 70 else 'yellow' if context_percent < 90 else 'red')}]{bar}[/] [green]{context_percent:.1f}%[/] ({last_prompt_tokens}/{MAX_CONTEXT_TOKENS} токенов)[/]")
+
                 user_input = session.prompt([('class:prompt', '[Ваш запрос] ➤ ')])
                 if user_input.lower().strip() in ('exit', 'quit', 'q'):
                     break
@@ -469,12 +475,6 @@ def main():
                 console.print(f"[bold yellow]Итерация {i+1}/{max_iterations}...[/]")
                 
                 try:
-                    context_percent = calculate_context_usage(chat_history)
-                    console.print(f"[dim]Контекст: [green]{context_percent:.1f}%[/] заполнен[/]")
-                    bar_length = 20
-                    filled = int(bar_length * context_percent / 100)
-                    bar = '█' * filled + '░' * (bar_length - filled)
-                    console.print(f"[dim][{bar}] [green]{context_percent:.1f}%[/][/]")
                     response = chain.invoke(
                         {"messages": chat_history},
                         config=RunnableConfig(callbacks=[StreamingOutputHandler()])
@@ -485,6 +485,24 @@ def main():
                     break
                 
                 console.print()
+
+                # Показ информации о токенах
+                if hasattr(response, "usage_metadata") and response.usage_metadata:
+                    usage = response.usage_metadata
+                    prompt = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
+                    completion = usage.get('completion_tokens') or usage.get('output_tokens', 0) or usage.get('generated_tokens', 0)
+                    total = usage.get('total_tokens', 0)
+
+                    # Если total все еще 0, но есть prompt и completion, посчитаем его
+                    if total == 0 and (prompt > 0 or completion > 0):
+                        total = prompt + completion
+                    
+                    last_prompt_tokens = prompt # Сохраняем для следующей итерации
+
+                    console.print(f"[dim]Токены: [green]prompt={prompt} completion={completion} total={total}[/]")
+                else:
+                    last_prompt_tokens = 0 # Сбрасываем, если инфо нет
+                    console.print("[yellow]Информация о токенах недоступна[/]")
                 
                 if response.tool_calls:
                     tool_messages = process_tool_calls(response.tool_calls, tools)
