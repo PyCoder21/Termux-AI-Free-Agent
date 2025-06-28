@@ -1,5 +1,9 @@
 # 🚀 FreeSeekR1-Agent: Your Autonomous AI Assistant for Termux 📱 + 🐳 + 🦜 = 🔥
 
+## Asciiname Demo:
+
+[![Asciinema Demo](https://asciinema.org/a/ghlVT2vpxVOULmGrajcDTUqo6.svg)](https://asciinema.org/a/ghlVT2vpxVOULmGrajcDTUqo6)
+
 ## Unleash the Power of AI, Totally free and Recursively! ✨
 
 FreeSeekR1-Agent is a cutting-edge LangChain 🦜 AI assistant designed to operate seamlessly within your Termux environment. This intelligent agent is built to tackle a wide array of tasks by **recursively answering and executing function calls until your objective is fully achieved!** Say goodbye to manual intervention and let FreeSeekR1-Agent drive your productivity.
