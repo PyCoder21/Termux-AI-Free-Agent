@@ -267,12 +267,11 @@ def get_git_repo(url: str) -> str:
         subprocess.run(["git", "clone", url, repo_dir], check=True, capture_output=True, text=True)
         
         console.print("[yellow]Конвертация репозитория в текст...[/]")
-        # Предполагается, что скрипт repo2txt.py находится в домашней директории
-        repo2txt_path = os.path.expanduser("~/repo2txt.py")
+        repo2txt_path = os.path.expanduser("~/FreeSeekR1-Agent/repo2txt.py")
         if not os.path.exists(repo2txt_path):
-            print("Ошибка: Скрипт repo2txt.py не найден в ~, скачиваем...")
+            print("Ошибка: Скрипт repo2txt.py не найден в ~/FreeSeekR1-Agent/, скачиваем...")
             url = "https://github.com/pde-rent/repo2txt/blob/main/main.py"
-            urllib.request.urlretrieve(url, "~/repo2txt.py")
+            urllib.request.urlretrieve(url, "~/FreeSeekR1-Agent/repo2txt.py")
             
         subprocess.run(
             ["python", repo2txt_path, "-d", repo_dir, "-o", output_file],
