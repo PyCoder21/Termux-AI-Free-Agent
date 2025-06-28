@@ -408,8 +408,46 @@ def create_llm_chain(config: Dict[str, Any], tools: List, is_interactive_mode: b
     llm_with_tools = llm.bind_tools(tools)
     return prompt | llm_with_tools
 
+def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
+    """Сжимает историю чата с помощью LLM и возвращает новую историю."""
+    console.print("[bold yellow]Сжатие истории чата...[/]")
+
+    # Создаем временную модель без потоковой передачи для сжатия
+    compressor_llm = ChatOpenAI(
+        api_key=config.get("api_key"),
+        model=config.get("model"), 
+        base_url=config.get("base_url"),
+        temperature=0.0 # Минимальная температура для предсказуемого результата
+    )
+
+    # Промпт для сжатия
+    compression_prompt_text = 'Summarize our conversation up to this point. The summary should be a concise yet comprehensive overview of all key topics, questions, answers, and important details discussed. This summary will replace the current chat history to conserve tokens, so it must capture everything essential to understand the context and continue our conversation effectively as if no information was lost.'
+    
+    # Создаем новый шаблон промпта только для сжатия
+    compression_prompt = ChatPromptTemplate.from_messages([
+        MessagesPlaceholder(variable_name="messages"),
+        ("user", compression_prompt_text)
+    ])
+
+    chain = compression_prompt | compressor_llm
+
+    try:
+        response = chain.invoke({"messages": chat_history})
+        summary = response.content
+        
+        console.print(Panel(f"[bold green]История успешно сжата.[/]\n[dim]{summary}[/dim]", border_style="green"))
+        
+        # Возвращаем новую историю, состоящую из одного сообщения-саммари
+        return [HumanMessage(content=f"This is a summary of the previous conversation:\n{summary}")]
+
+    except Exception as e:
+        console.print(f"[bold red]Ошибка при сжатии истории: {escape(str(e))}[/]")
+        return chat_history # Возвращаем старую историю в случае ошибки
+
+
+
 def main():
-    """Главная функция, запускающая CLI."""
+    """Главная функция, запускающая CLI.""" 
     import sys
 
     is_interactive_mode = not (len(sys.argv) > 1)
@@ -457,6 +495,14 @@ def main():
                 user_input = session.prompt([('class:prompt', '[Ваш запрос] ➤ ')])
                 if user_input.lower().strip() in ('exit', 'quit', 'q'):
                     break
+                if user_input.lower().strip() == '/compress':
+                    if len(chat_history) > 1:
+                        chat_history = compress_chat_history(chat_history, CONFIG)
+                        last_prompt_tokens = 0 # Сбрасываем токены, чтобы они пересчитались на след. шаге
+                    else:
+                        console.print("[yellow]История чата слишком коротка для сжатия.[/]")
+                    continue
+
                 if not user_input.strip():
                     continue
             else:
