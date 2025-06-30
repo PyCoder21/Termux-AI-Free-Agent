@@ -1,6 +1,6 @@
 # 🚀 FreeSeekR1-Agent: Your Autonomous AI Assistant for Termux 📱 + 🐳 + 🦜 = 🔥
 
-## Asciiname Demo:
+## Asciinema Demo:
 
 [![Asciinema Demo](https://asciinema.org/a/ghlVT2vpxVOULmGrajcDTUqo6.svg)](https://asciinema.org/a/ghlVT2vpxVOULmGrajcDTUqo6)
 
