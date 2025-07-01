@@ -75,8 +75,14 @@ Here is the complete tool list:
     *   Runs a command interactively.
 
 ### 🚀 Get Started:                                                                                       
-To begin your journey with FreeSeekR1-Agent, simply run the `ai.py` script in your Termux environment.
+To begin your journey with FreeSeekR1-Agent, simplyrun the install.sh, then run the `ai.py` script in your Termux environment.
 
+**Install :**
+```bash
+bash install.sh
+```
+
+**Run :**
 ```bash
 python ai.py
 ```
