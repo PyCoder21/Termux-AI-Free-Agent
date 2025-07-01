@@ -48,7 +48,7 @@ echo "" # Newline for spacing
 
 # 3. Установка зависимостей Python
 echo -e "${YELLOW}--- Шаг 3: Установка зависимостей Python ---${NC}"
-pip install pexpect requests langchain-community langchain-core langchain-openai prompt_toolkit rich sympy numexpr pollinations
+pip install pexpect requests langchain-community langchain-core langchain-openai prompt_toolkit rich sympy numexpr pollinations pollinations.ai
 echo "" # Newline for spacing
 
 # --- Завершение ---
