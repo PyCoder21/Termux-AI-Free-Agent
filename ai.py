@@ -55,7 +55,7 @@ def load_config() -> Dict[str, Any]:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         console.print(f"[bold red]Ошибка загрузки config.json:[/]{e}")
-        console.print("[yellow]Создайте config.json с необходимыми ключами (api_key, model, base_url).[/]")
+        console.print("[yellow]Создайте config.json с необходимыми ключами (model, base_url).[/]")
         exit(1)
 
 CONFIG = load_config()
@@ -423,7 +423,7 @@ def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[To
 def create_llm_chain(config: Dict[str, Any], tools: List, is_interactive_mode: bool) -> Any:
     """Создает и настраивает цепочку LLM с инструментами."""
     llm = ChatOpenAI(
-        api_key=config.get("api_key"),
+        api_key=os.getenv("POLLINATIONS_API_TOKEN"),
         model=config.get("model"),
         streaming=True,
         base_url=config.get("base_url"),

@@ -11,14 +11,13 @@ FreeSeekR1-Agent is a cutting-edge LangChain 🦜 AI assistant designed to opera
 ### 🖥️ NEW!!!:
 
 - **Run interactive commands:** FreeSeekR1-Agent now can run fully interactive commands using pexpect!!!
-
 - **Context compression:** If your context is full, you can use the `/compress` command to replace the dialog history with a detailed summary by DeepSeek.
 - **Context fullness indicator:** At the end of each response, there is an indicator showing the percentage of context fullness.
 
 ### 🌟 Key Features:                                                                                      
 -   **Autonomous Execution:** The agent intelligently breaks down complex tasks and executes a series of tool calls, iterating until the goal is met.
 -   **Recursive Problem Solving:** It's designed to think, act, and refine its approach through multiple iterations of tool usage and response generation.
--   **Zero API Key Hassle!** 🎉 Unlike many AI solutions, FreeSeekR1-Agent is designed to be incredibly accessible. It leverages powerful, **API-key-free** tools like DeepSeek API (via `ChatOpenAI` with a compatible `base_url`) and various LangChain Community tools, meaning you can get started without the need for cumbersome API registrations or hidden costs.
+-   **Zero cost!** 🎉 Unlike many AI solutions, FreeSeekR1-Agent is designed to be incredibly accessible. It leverages powerful, **zero-cost** tools like DeepSeek API (via `ChatOpenAI` with a compatible `base_url`) and various LangChain Community tools, meaning you can get started without the need for cumbersome API registrations or hidden costs.
 -   **Rich Toolset:** Equipped with a diverse set of tools, FreeSeekR1-Agent can interact with your system, fetch information from the web, perform calculations, and much more.
 -   **Termux Optimized:** Tailored for the Termux environment, ensuring smooth operation and compatibility with your mobile Linux setup.
 
@@ -53,7 +52,7 @@ Here is the complete tool list:
 
 9.  **`stackoverflow(query: str)`**
     *   Searches for programming-related answers on StackOverflow.
-
+    
 10. **`calculator(expression: str)`**
     *   Evaluates mathematical expressions (e.g., `37593 * 67`, `pi * e`).
 

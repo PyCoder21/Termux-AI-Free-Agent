@@ -1,5 +1,4 @@
 {
-    "api_key": "sk-12345",
     "model": "deepseek-reasoning",
     "base_url": "https://text.pollinations.ai/openai/v1",
     "default_latitude": 55.75,
