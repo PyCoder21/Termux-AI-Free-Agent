@@ -51,7 +51,7 @@ console = Console()
 def load_config() -> Dict[str, Any]:
     """Загружает конфигурацию из файла config.json."""
     try:
-        with open("config.json", "r") as f:
+        with open("/data/data/com.termux/files/home/FreeSeekR1-Agent/config.json", "r") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         console.print(f"[bold red]Ошибка загрузки config.json:[/]{e}")
