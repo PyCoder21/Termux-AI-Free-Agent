@@ -462,7 +462,7 @@ def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
 
     # Создаем временную модель без потоковой передачи для сжатия
     compressor_llm = ChatOpenAI(
-        api_key=config.get("api_key"),
+        api_key=os.getenv("POLLINATIONS_API_TOKEN"),
         model=config.get("model"), 
         base_url=config.get("base_url"),
         temperature=0.0 # Минимальная температура для предсказуемого результата
