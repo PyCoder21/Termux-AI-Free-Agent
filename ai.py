@@ -12,7 +12,6 @@ import pollinations
 import requests
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.tools import (
-    ShellTool,
     WikipediaQueryRun,
     DuckDuckGoSearchResults,
 )
@@ -75,7 +74,6 @@ try:
     STACKEXCHANGE_API_WRAPPER = StackExchangeAPIWrapper(query_type='all', max_results=10)
 
     # Инструменты LangChain
-    SHELL_TOOL = ShellTool(handle_tool_error=True)
     SEARCH_TOOL = DuckDuckGoSearchResults()
     WIKIDATA_TOOL = WikidataQueryRun(api_wrapper=WIKIDATA_API_WRAPPER)
 
@@ -87,18 +85,6 @@ except Exception as e:
 # ==============================================================================
 # 3. Определение инструментов (Tools)
 # ==============================================================================
-
-@tool
-def run_command(cmd: str) -> str:
-    """
-    Выполняет одну shell-команду в Termux и возвращает ее вывод.
-    Используйте эту функцию для выполнения системных команд.
-    Например: "ls -l"
-    """
-    try:
-        return SHELL_TOOL.run(cmd)
-    except Exception as e:
-        return f"Ошибка выполнения команды '{cmd}': {e}"
 
 @tool
 def read_file(filepath: str) -> str:
@@ -439,7 +425,7 @@ def create_llm_chain(config: Dict[str, Any], tools: List, is_interactive_mode: b
 - **Координаты:** Для погоды используй широту и долготу, округленные до двух знаков после точки (например, 55.75, 37.62 для Москвы).
 - **Контекст Termux:** Помни, что ты работаешь в Termux. Адаптируй команды и пути к файлам под эту среду. При поиске ошибок в интернете, фокусируйся на общей части ошибки, а не на специфичных для Termux путях.
 - **Не выдумывай:** Если не знаешь, как что-то сделать, используй поисковые инструменты.
-- Для любых команд требующих взаимодействия или завершения со стороны пользователя (интерактивные) - используй run_cmd_pexpect, он позволяет выполнять команды ПОЛНОСТЬЮ интерактивно, даже очень интерактивные, но не программы с curses, так как это ломает терминал.
+- run_cmd_pexpect позволяет выполнять команды ПОЛНОСТЬЮ интерактивно, даже очень интерактивные, но не программы с curses, так как это ломает терминал.
 """
     
     if not is_interactive_mode:
@@ -521,7 +507,7 @@ def main():
         session = None
 
     tools = [
-        run_command, read_file, write_file, edit_file, wikipedia, create_image,
+        read_file, write_file, edit_file, wikipedia, create_image,
         duckduckgo, get_weather_data, stackoverflow, calculator, solve_equation,
         scrape_webpage, get_git_repo, query_wikidata, open_url, run_cmd_pexpect
     ]
@@ -622,4 +608,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-          
