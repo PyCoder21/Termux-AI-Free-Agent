@@ -22,7 +22,7 @@ FreeSeekR1-Agent is a cutting-edge LangChain 🦜 AI assistant designed to opera
 -   **Termux Optimized:** Tailored for the Termux environment, ensuring smooth operation and compatibility with your mobile Linux setup.
 
 ### 🛠️ Tools at Your Command:                                                                              
-FreeSeekR1-Agent can work with files, execute interactive commands, search in DuckDuckgo, Wikipedia, WikiData, and StackOverflow, get the values of expressions, solve equations, get the weather, get the content of web pages, get the weather, open an URL on your phone, and even generate images.
+FreeSeekR1-Agent can work with files, execute interactive commands, search in DuckDuckgo, Wikipedia, WikiData, and StackOverflow, get the values of expressions, solve equations, get the weather, get the content of web pages, get the weather, open an URL on your phone, ask additional questions, and even generate images.
 
 Here is the complete tool list:
 
@@ -70,6 +70,9 @@ Here is the complete tool list:
 
 15. **`open_url(url: str)`**
     *   Opens an URL on your phone.
+
+16. **`ask(question: str)`**
+    *   Ask an additional question.
 
 ### 🚀 Get Started:                                                                                       
 To begin your journey with FreeSeekR1-Agent, simplyrun the install.sh, then run the `ai.py` script in your Termux environment.

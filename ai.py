@@ -341,6 +341,23 @@ def run_cmd_pexpect(command, verbose=False, cwd=None):
         error_msg = f"Error running command {command}: {e}"
         return 1, error_msg
 
+@tool
+def ask(question):
+    """Задать дополнительный вопрос пользователю"""
+    # Создаем стиль с зеленым текстом для приглашения
+    style = Style.from_dict({
+        'prompt': 'bold ansigreen',
+        'input': 'bold'
+    })
+    
+    # Создаем интерактивную сессию с нужным форматом
+    session = PromptSession()
+    user_input = session.prompt(
+        [('class:prompt', f'{question} => Ваш ответ : ')],
+        style=style
+    )
+    return user_input
+
 
 # ==============================================================================
 # 4. Обработка вывода и вызовов инструментов
@@ -509,7 +526,8 @@ def main():
     tools = [
         read_file, write_file, edit_file, wikipedia, create_image,
         duckduckgo, get_weather_data, stackoverflow, calculator, solve_equation,
-        scrape_webpage, get_git_repo, query_wikidata, open_url, run_cmd_pexpect
+        scrape_webpage, get_git_repo, query_wikidata, open_url, run_cmd_pexpect,
+        ask
     ]
     chain = create_llm_chain(CONFIG, tools, is_interactive_mode)
     chat_history = []
