@@ -117,13 +117,12 @@ def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[To
 def create_llm_chain(config: Dict[str, Any], tools: List, is_interactive_mode: bool) -> Any:
     """Создает и настраивает цепочку LLM с инструментами."""
     llm = ChatOpenAI(
-        api_key=os.getenv("POLLINATIONS_API_TOKEN"),
-        model=config.get("model"),
+        api_key="sk-",
+        model="Qwen/Qwen3-235B-A22B-fp8-tput",
         streaming=True,
-        base_url=config.get("base_url"),
+        base_url="http://127.0.0.1:8000/v1",
         temperature=0.1,
     )
-    
     # Системный промпт
     system_prompt = """
 Ты — AI ассистент в среде Termux. Твоя задача — помогать пользователю, выполняя задачи шаг за шагом.
@@ -156,12 +155,12 @@ def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
 
     # Создаем временную модель без потоковой передачи для сжатия
     compressor_llm = ChatOpenAI(
-        api_key=os.getenv("POLLINATIONS_API_TOKEN"),
-        model=config.get("model"), 
-        base_url=config.get("base_url"),
-        temperature=0.0 # Минимальная температура для предсказуемого результата
+        api_key="sk-",
+        model="Qwen/Qwen3-235B-A22B-fp8-tput",
+        streaming=True,
+        base_url="http://127.0.0.1:8000/v1",
+        temperature=0.0,
     )
-
     # Промпт для сжатия
     compression_prompt_text = 'Summarize our conversation up to this point. The summary should be a concise yet comprehensive overview of all key topics, questions, answers, and important details discussed. This summary will replace the current chat history to conserve tokens, so it must capture everything essential to understand the context and continue our conversation effectively as if no information was lost.'
     

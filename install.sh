@@ -4,6 +4,7 @@
 BLUE='\033[1;34m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
+RED='\033[1;31m'
 NC='\033[0m' # No Color
 
 # Очистка экрана
@@ -19,24 +20,94 @@ echo '############################################################'
 echo -e "${NC}"
 echo -e "${GREEN}Скрипт установки FreeSeekR1-Agent${NC}\n"
 
-# --- Начало установки ---
+# --- Выбор режима установки ---
+echo -e "${YELLOW}Выберите режим установки:${NC}"
+echo "1) Только Pollinations API"
+echo "2) Только Termux-services (reverse proxy)"
+echo "3) Оба варианта"
+echo -e "${RED}4) Отмена${NC}"
+echo ""
 
-# 1. Проверка POLLINATIONS_API_TOKEN
-echo -e "${YELLOW}--- Шаг 1: Проверка токена Pollinations ---${NC}"
-if [ -z "$POLLINATIONS_API_TOKEN" ]; then
-    echo "Переменная POLLINATIONS_API_TOKEN не установлена."
-    read -p "Пожалуйста, введите ваш токен Pollinations: " token
-    # Используем printf для безопасной записи токена
-    printf "\nexport POLLINATIONS_API_TOKEN=%q\n" "$token" >> ~/.bashrc
-    echo -e "${GREEN}Токен добавлен в ~/.bashrc. Перезапустите терминал или выполните 'source ~/.bashrc'${NC}"
-    export POLLINATIONS_API_TOKEN="$token"
-else
-    echo -e "${GREEN}Токен POLLINATIONS_API_TOKEN найден.${NC}"
+read -p "Введите номер выбора (1-4): " choice
+
+case $choice in
+    1)
+        echo -e "${GREEN}Выбран режим: Только Pollinations API${NC}"
+        pollinations_only=true
+        termux_services_only=false
+        ;;
+    2)
+        echo -e "${GREEN}Выбран режим: Только Termux-services${NC}"
+        pollinations_only=false
+        termux_services_only=true
+        ;;
+    3)
+        echo -e "${GREEN}Выбран режим: Оба варианта${NC}"
+        pollinations_only=false
+        termux_services_only=false
+        ;;
+    4)
+        echo -e "${RED}Установка отменена${NC}"
+        exit 0
+        ;;
+    *)
+        echo -e "${RED}Неверный выбор, выход${NC}"
+        exit 1
+        ;;
+esac
+
+echo ""
+
+# --- Установка Pollinations API ---
+if ! $termux_services_only; then
+    echo -e "${YELLOW}--- Шаг 1: Настройка Pollinations API ---${NC}"
+    if [ -z "$POLLINATIONS_API_TOKEN" ]; then
+        echo "Переменная POLLINATIONS_API_TOKEN не установлена."
+        read -p "Пожалуйста, введите ваш токен Pollinations: " token
+        # Используем printf для безопасной записи токена
+        printf "\nexport POLLINATIONS_API_TOKEN=%q\n" "$token" >> ~/.bashrc
+        echo -e "${GREEN}Токен добавлен в ~/.bashrc. Перезапустите терминал или выполните 'source ~/.bashrc'${NC}"
+        export POLLINATIONS_API_TOKEN="$token"
+    else
+        echo -e "${GREEN}Токен POLLINATIONS_API_TOKEN найден.${NC}"
+    fi
+    echo ""
 fi
-echo "" # Newline for spacing
 
-# 2. Проверка и установка chafa
-echo -e "${YELLOW}--- Шаг 2: Проверка и установка утилиты chafa ---${NC}"
+# --- Установка Termux-services ---
+if ! $pollinations_only; then
+    echo -e "${YELLOW}--- Шаг 2: Настройка Termux-services ---${NC}"
+    if ! command -v sv &> /dev/null; then
+        echo "Утилита sv (termux-services) не найдена. Устанавливаю..."
+        pkg install termux-services -y
+        echo -e "${GREEN}termux-services успешно установлен.${NC}"
+    else
+        echo -e "${GREEN}termux-services уже установлен.${NC}"
+    fi
+    
+    # Создаем структуру папок для сервиса
+    if [ ! -d "$PREFIX/var/service" ]; then
+        mkdir -p "$PREFIX/var/service"
+    fi
+    
+    # Создаем сервис для gptchatbot
+    if [ ! -d "$PREFIX/var/service/gptchatbot" ]; then
+        mkdir -p "$PREFIX/var/service/gptchatbot"
+        echo "#!/usr/bin/bash" > "$PREFIX/var/service/gptchatbot/run"
+        echo "python ~/FreeSeekR1-Agent/proxy.py" >> "$PREFIX/var/service/gptchatbot/run"
+        chmod +x "$PREFIX/var/service/gptchatbot/run"
+        sv-enable gptchatbot
+        echo -e "${GREEN}Сервис gptchatbot создан и включен.${NC}"
+    else
+        echo -e "${YELLOW}Сервис gptchatbot уже существует.${NC}"
+    fi
+    echo ""
+fi
+
+# --- Общие зависимости ---
+echo -e "${YELLOW}--- Шаг 3: Установка общих зависимостей ---${NC}"
+
+# Проверка и установка chafa
 if ! command -v chafa &> /dev/null; then
     echo "Утилита chafa не найдена. Устанавливаю..."
     pkg install chafa -y
@@ -44,16 +115,23 @@ if ! command -v chafa &> /dev/null; then
 else
     echo -e "${GREEN}chafa уже установлена.${NC}"
 fi
-echo "" # Newline for spacing
 
-# 3. Установка зависимостей Python
-echo -e "${YELLOW}--- Шаг 3: Установка зависимостей Python ---${NC}"
+# Установка зависимостей Python
+echo "Устанавливаю Python зависимости..."
 pip install pexpect requests langchain-community langchain-core langchain-openai prompt_toolkit rich sympy numexpr pollinations pollinations.ai
-echo "" # Newline for spacing
+echo ""
 
 # --- Завершение ---
 echo -e "${GREEN}====================================="
 echo -e "    Установка успешно завершена!    "
 echo -e "=====================================${NC}"
-echo "Теперь вы можете запустить агент, выполнив команду: python ai.py"
+
+if ! $termux_services_only; then
+    echo "Для использования Pollinations API запустите: python ai.py"
+fi
+
+if ! $pollinations_only; then
+    echo "Сервис reverse proxy был настроен и будет автоматически запускаться при старте Termux."
+fi
+
 echo ""
