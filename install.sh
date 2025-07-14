@@ -101,6 +101,9 @@ if ! $pollinations_only; then
     else
         echo -e "${YELLOW}Сервис gptchatbot уже существует.${NC}"
     fi
+
+    pkg install tur-repo python-torch python-torchaudio python-torchvision -y
+    pkg install python-tiktoken -y
     echo ""
 fi
 
