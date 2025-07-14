@@ -1,14 +1,17 @@
+"""
+ai.py
+This is the project's main file
+"""
+
+import sys
 import argparse
-from tools import get_tools
 import json
 import os
 from typing import List, Dict, Any
-
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnableConfig
-from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -20,15 +23,15 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.markup import escape
-
-from sympy import symbols, Eq, solve, sympify, S
-from sympy.parsing.sympy_parser import parse_expr
+from tools import get_tools
 
 # ==============================================================================
 # 1. Глобальные настройки и инициализация
 # ==============================================================================
 
+
 console = Console()
+
 
 def load_config() -> Dict[str, Any]:
     """Загружает конфигурацию из файла config.json."""
@@ -38,13 +41,14 @@ def load_config() -> Dict[str, Any]:
     except (FileNotFoundError, json.JSONDecodeError) as e:
         console.print(f"[bold red]Ошибка загрузки config.json:[/]{e}")
         console.print("[yellow]Создайте config.json с необходимыми ключами (model, base_url).[/]")
-        exit(1)
+        sys.exit(1)
+
 
 CONFIG = load_config()
 
-# Максимальный размер контекста модели в токенах. 
+# Максимальный размер контекста модели в токенах.
 # Желательно установить значение, соответствующее вашей модели (например, 128000 для gpt-4-turbo)
-MAX_CONTEXT_TOKENS = 128000 
+MAX_CONTEXT_TOKENS = 128000
 
 # ==============================================================================
 # 2. Инициализация API и оберток
@@ -65,10 +69,8 @@ def display_tool_call(tool_call: Dict[str, Any]):
     tool_name = tool_call['name']
     tool_args = tool_call['args']
     panel_content = f"[bold]Инструмент:[/][cyan]{tool_name}[/][bold]Аргументы:[/]"
-    
     args_str = json.dumps(tool_args, indent=2, ensure_ascii=False)
     panel_content += str(Syntax(args_str, "json", theme="monokai", line_numbers=True))
-    
     console.print(Panel(panel_content, title="[yellow]Вызов инструмента", border_style="yellow"))
 
 def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[ToolMessage]:
@@ -78,7 +80,6 @@ def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[To
 
     for tool_call in tool_calls:
         display_tool_call(tool_call)
-        
         if func := tool_map.get(tool_call['name']):
             try:
                 result = func.invoke(tool_call['args'])
@@ -108,7 +109,6 @@ def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[To
                 name=tool_call['name'],
                 tool_call_id=tool_call['id']
             ))
-            
     return tool_messages
 
 # ==============================================================================
@@ -150,7 +150,7 @@ def create_llm_chain(
             streaming=True,
             base_url=config.get("base_url"),
             temperature=0.1,
-        )    
+        )
     # Системный промпт
     system_prompt = """
 Ты — AI ассистент в среде Termux. Твоя задача — помогать пользователю, выполняя задачи шаг за шагом.
@@ -162,18 +162,15 @@ def create_llm_chain(
 - **Не выдумывай:** Если не знаешь, как что-то сделать, используй поисковые инструменты.
 - run_cmd_pexpect позволяет выполнять команды ПОЛНОСТЬЮ интерактивно, даже очень интерактивные, но не программы с curses, так как это ломает терминал.
 """
-    
     if not is_interactive_mode:
         system_prompt += """
 
 ВНИМАНИЕ: Ты находишься в НЕИНТЕРАКТИВНОМ режиме. Ты ДОЛЖЕН выполнить задачу полностью, не ожидая уточнений от пользователя. Если ты не знаешь, как поступить, выбери наиболее подходящий вариант и продолжи выполнение. НЕ ЗАДАВАЙ ВОПРОСОВ.
 """
-    
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
         MessagesPlaceholder(variable_name="messages")
     ])
-    
     llm_with_tools = llm.bind_tools(tools)
     return prompt | llm_with_tools
 
@@ -184,14 +181,13 @@ def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
     # Создаем временную модель без потоковой передачи для сжатия
     compressor_llm = ChatOpenAI(
         api_key=os.getenv("POLLINATIONS_API_TOKEN"),
-        model=config.get("model"), 
+        model=config.get("model"),
         base_url=config.get("base_url"),
         temperature=0.0 # Минимальная температура для предсказуемого результата
     )
 
     # Промпт для сжатия
     compression_prompt_text = 'Summarize our conversation up to this point. The summary should be a concise yet comprehensive overview of all key topics, questions, answers, and important details discussed. This summary will replace the current chat history to conserve tokens, so it must capture everything essential to understand the context and continue our conversation effectively as if no information was lost.'
-    
     # Создаем новый шаблон промпта только для сжатия
     compression_prompt = ChatPromptTemplate.from_messages([
         MessagesPlaceholder(variable_name="messages"),
@@ -203,9 +199,7 @@ def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
     try:
         response = chain.invoke({"messages": chat_history})
         summary = response.content
-        
         console.print(Panel(f"[bold green]История успешно сжата.[/]\n[dim]{summary}[/dim]", border_style="green"))
-        
         # Возвращаем новую историю, состоящую из одного сообщения-саммари
         return [HumanMessage(content=f"This is a summary of the previous conversation:\n{summary}")]
 
@@ -264,8 +258,8 @@ def main():
                     context_percent = min(100.0, (last_prompt_tokens / MAX_CONTEXT_TOKENS) * 100)
                     bar_length = 20
                     filled = int(bar_length * context_percent / 100)
-                    bar = '█' * filled + '░' * (bar_length - filled)
-                    console.print(f"[dim]Контекст: [{('green' if context_percent < 70 else 'yellow' if context_percent < 90 else 'red')}]{bar}[/] [green]{context_percent:.1f}%[/] ({last_prompt_tokens}/{MAX_CONTEXT_TOKENS} токенов)[/]")
+                    indicator = '█' * filled + '░' * (bar_length - filled)
+                    console.print(f"[dim]Контекст: [{('green' if context_percent < 70 else 'yellow' if context_percent < 90 else 'red')}]{indicator}[/] [green]{context_percent:.1f}%[/] ({last_prompt_tokens}/{MAX_CONTEXT_TOKENS} токенов)[/]")
 
                 user_input = session.prompt([('class:prompt', '[Ваш запрос] ➤ ')])
                 if user_input.lower().strip() in ('exit', 'quit', 'q'):
@@ -290,7 +284,6 @@ def main():
 
             console.print("-" * 50)
             chat_history.append(HumanMessage(content=user_input))
-            
             max_iterations = 50
             for i in range(max_iterations):
                 console.print(f"[bold yellow]Итерация {i+1}/{max_iterations}...[/]")

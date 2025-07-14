@@ -1,12 +1,14 @@
-# tools.py
-import pexpect
+"""
+tools.py
+This is the file with the tools of the AI Agent.
+"""
 from io import BytesIO
 import urllib.request
-import json
 import math
 import os
 import subprocess
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Any, Tuple
+import pexpect
 
 import numexpr
 import pollinations
@@ -99,7 +101,7 @@ def get_weather_data(latitude: float, longitude: float) -> str:
         "&current=is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
     )
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         response.raise_for_status()
         return response.text
     except requests.RequestException as e:
@@ -142,7 +144,7 @@ def solve_equation(equation_str: str, variable: str = 'x') -> str:
         if not solutions:
             return "Решений не найдено."
         if solutions == [True]:
-             return "Бесконечное множество решений."
+            return "Бесконечное множество решений."
 
         return "; ".join(map(str, solutions))
     except Exception as e:
@@ -205,7 +207,7 @@ def open_url(url: str) -> str:
     except Exception as e:
         return f"Ошибка открытия URL: {str(e)}"
 
-def run_cmd_pexpect(command: str, verbose: bool = False, cwd: Optional[str] = None) -> Tuple[int, str]:
+def run_cmd_pexpect(command: str, cwd: Optional[str] = None) -> Tuple[int, str]:
     """Выполняет команду в интерактивной оболочке с помощью pexpect."""
     output = BytesIO()
 
