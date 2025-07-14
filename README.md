@@ -100,6 +100,13 @@ python ai.py "What is the weather in Paris today?"
 python qwen.py
 ```
 
-It alse has a non-interactive mode.
+It also has a non-interactive mode.
+
+**Or the GPT-4.5 version: no-auth version :**
+```bash
+python gpt.py
+```
+
+It also has a non-interactive mode.
 
 Start interacting with your new autonomous AI assistant today!
