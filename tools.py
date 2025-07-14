@@ -242,6 +242,27 @@ def ask(question: str) -> str:
         style=style
     )
 
+def ls(path = "."):
+    """Выводит список всех файлов и папок в директории"""
+
+    try:
+        entries = os.listdir(path)
+        entries_info = []
+        for entry in sorted(entries):
+            full_path = os.path.join(path, entry)
+            if os.path.isdir(full_path):
+                entry_type = "directory"
+            elif os.path.isfile(full_path):
+                entry_type = "file"
+            else:
+                entry_type = "other"
+            entries_info.append({"name": entry, "type": entry_type})
+
+        return {"path": path, "contents": entries_info}
+
+    except Exception as e:
+        return {"error": f"Could not list directory '{path}': {e}"}
+
 def get_tools() -> List[Any]:
     """Возвращает список всех инструментов LangChain."""
     from langchain_core.tools import tool
