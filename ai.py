@@ -1,3 +1,4 @@
+import argparse
 from tools import get_tools
 import json
 import os
@@ -114,16 +115,42 @@ def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[To
 # 5. Основной цикл приложения (CLI)
 # ==============================================================================
 
-def create_llm_chain(config: Dict[str, Any], tools: List, is_interactive_mode: bool) -> Any:
-    """Создает и настраивает цепочку LLM с инструментами."""
-    llm = ChatOpenAI(
-        api_key=os.getenv("POLLINATIONS_API_TOKEN"),
-        model=config.get("model"),
-        streaming=True,
-        base_url=config.get("base_url"),
-        temperature=0.1,
-    )
-    
+def create_llm_chain(
+    config: Dict[str, Any],
+    tools: List,
+    is_interactive_mode: bool,
+    *,
+    use_gpt: bool = False,
+    use_qwen: bool = False
+) -> Any:
+    """Создает цепочку LLM с инструментами."""
+    if use_qwen:
+        # Настройки для Qwen
+        llm = ChatOpenAI(
+            api_key="sk-",
+            model="Qwen/Qwen3-235B-A22B-fp8-tput",
+            streaming=True,
+            base_url="http://127.0.0.1:8000/v1",
+            temperature=0.1,
+        )
+    elif use_gpt:
+        # Настройки для ChatGPT
+        llm = ChatOpenAI(
+            api_key="sk-",
+            model="gpt-4.5-preview",
+            streaming=True,
+            base_url="http://127.0.0.1:8000/v1",
+            temperature=0.1,
+        )
+    else:
+        # Модель из конфига (по умолчанию)
+        llm = ChatOpenAI(
+            api_key=os.getenv("POLLINATIONS_API_TOKEN"),
+            model=config.get("model"),
+            streaming=True,
+            base_url=config.get("base_url"),
+            temperature=0.1,
+        )    
     # Системный промпт
     system_prompt = """
 Ты — AI ассистент в среде Termux. Твоя задача — помогать пользователю, выполняя задачи шаг за шагом.
@@ -189,12 +216,16 @@ def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
 
 
 def main():
-    """Главная функция, запускающая CLI.""" 
-    import sys
+    """Главная функция, запускающая CLI."""
+    # Парсинг аргументов
+    parser = argparse.ArgumentParser()
+    parser.add_argument('query', nargs='*', help='Запрос для неинтерактивного режима')
+    parser.add_argument('--gpt', action='store_true', help='Использовать OpenAI GPT')
+    parser.add_argument('--qwen', action='store_true', help='Использовать Qwen')
+    args = parser.parse_args()
 
-    is_interactive_mode = not (len(sys.argv) > 1)
-    initial_query = " ".join(sys.argv[1:]) if not is_interactive_mode else None
-
+    is_interactive_mode = not args.query
+    initial_query = " ".join(args.query) if args.query else None
     console.print(Panel.fit(
         "[bold magenta]🤖 AI Ассистент для Termux[/]",
         subtitle="[cyan]📱 + 🐳 + 🦜 = 🔥[/]",
@@ -215,7 +246,13 @@ def main():
         session = None
 
     tools = get_tools()
-    chain = create_llm_chain(CONFIG, tools, is_interactive_mode)
+    chain = create_llm_chain(
+        CONFIG,
+        tools,
+        is_interactive_mode,
+        use_gpt=args.gpt,
+        use_qwen=args.qwen
+    )
     chat_history = []
     last_prompt_tokens = 0
 

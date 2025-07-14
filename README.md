@@ -97,14 +97,14 @@ python ai.py "What is the weather in Paris today?"
 **Or you can use the qwen no-auth version :**
 
 ```bash
-python qwen.py
+python ai.py --qwen
 ```
 
 It also has a non-interactive mode.
 
 **Or the GPT-4.5 version: no-auth version :**
 ```bash
-python gpt.py
+python ai.py --gpt
 ```
 
 It also has a non-interactive mode.
