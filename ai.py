@@ -294,7 +294,7 @@ def main():
                         config=RunnableConfig(callbacks=[StreamingOutputHandler()])
                     )
                 except Exception as e:
-                    console.print(f"[bold red]Ошибка при вызове модели:[/]")
+                    console.print("[bold red]Ошибка при вызове модели:[/]")
                     console.print(escape(str(e)))
                     break
                 
@@ -335,7 +335,7 @@ def main():
         except (KeyboardInterrupt, EOFError):
             break
         except Exception as e:
-            console.print(f"[bold red]Произошла критическая ошибка:[/]")
+            console.print("[bold red]Произошла критическая ошибка:[/]")
             console.print(escape(str(e)))
             
     console.print("[bold green]Выход...[/]")

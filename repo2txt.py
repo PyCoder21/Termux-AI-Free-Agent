@@ -70,7 +70,7 @@ def main():
   /_/|_|\__/ ,__/\___/____/\__//_\_\\__/
           /_/    for llms & text-mining
 """)
-  parser = argparse.ArgumentParser(description=f"With Repo2txt, dump any repo or directory's contents into a single text file.")
+  parser = argparse.ArgumentParser(description="With Repo2txt, dump any repo or directory's contents into a single text file.")
   parser.add_argument('-v', '--version', action='version', version='Repo2txt v1.0')
   parser.add_argument('-d', '--directory', required=True, help='Directory to dump')
   parser.add_argument('-t', '--tree', default=False, action='store_true', help='Generate tree only and not dump file contents to the output file')
