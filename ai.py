@@ -122,8 +122,10 @@ def create_llm_chain(
     *,
     use_gpt: bool = False,
     use_qwen: bool = False,
-    use_gemini: bool = False
+    use_gemini: bool = False,
+    use_deepseek: bool = False
 ) -> Any:
+    use_together = False
     """Создает цепочку LLM с инструментами."""
     if use_qwen:
         mo = "Qwen/Qwen3-235B-A22B-fp8-tput"
@@ -131,6 +133,9 @@ def create_llm_chain(
         mo = "gpt-4.5-preview"
     elif use_gemini:
         mo = "google/gemini-2.5-pro-preview-05-06"
+    elif use_deepseek:
+        mo = "deepseek-ai/DeepSeek-V3"
+        use_together = True
     else:
         # Модель из конфига (по умолчанию)
         if config.get("default_model") == "qwen":
@@ -139,16 +144,28 @@ def create_llm_chain(
             mo = "gpt-4.5-preview"
         elif config.get("default_model") == "gemini-2.5-pro":
             mo = "google/gemini-2.5-pro-preview-05-06"
+        elif config.get("default_model") == "deepseek-v3":
+            mo = "deepseek-ai/DeepSeek-V3"
+            use_together = True
         else:
-            print("set default model to qwen, gpt or gemini-2.5-pro.")
+            print("set default model to qwen, gpt, gemini-2.5-pro or deepseek-v3.")
             sys.exit(1)
-    llm = ChatOpenAI(
-        api_key="sk-",
-        model=mo,
-        streaming=True,
-        base_url="http://127.0.0.1:8000/v1",
-        temperature=0.1,
-    )
+    if use_together:
+        llm = ChatOpenAI(
+            api_key="56c8eeff9971269d7a7e625ff88e8a83a34a556003a5c87c289ebe9a3d8a3d2c",
+            model=mo,
+            streaming=True,
+            base_url="https://api.together.xyz/v1",
+            temperature=0.1,
+        )
+    else:
+        llm = ChatOpenAI(
+            api_key = "sk-",
+            model=mo,
+            streaming=True,
+            base_url="http://127.0.0.1:8000/v1",
+            temperature=0.1,
+        )
     # Системный промпт
     system_prompt = """
 Ты — AI ассистент в среде Termux. Твоя задача — помогать пользователю, выполняя задачи шаг за шагом.
@@ -216,6 +233,7 @@ def main():
     parser.add_argument('--gpt', action='store_true', help='Использовать OpenAI GPT')
     parser.add_argument('--qwen', action='store_true', help='Использовать Qwen')
     parser.add_argument('--gemini', action='store_true', help='Использовать Gemini')
+    parser.add_argument('--deepseek', action='store_true', help='Использовать DeepSeek-V3')
     args = parser.parse_args()
 
     is_interactive_mode = not args.query
@@ -246,7 +264,8 @@ def main():
         is_interactive_mode,
         use_gpt=args.gpt,
         use_qwen=args.qwen,
-        use_gemini=args.gemini
+        use_gemini=args.gemini,
+        use_deepseek=args.deepseek
     )
     chat_history = []
     last_prompt_tokens = 0
