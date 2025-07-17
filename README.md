@@ -78,9 +78,6 @@ Here is the complete tool list:
 17. **`ls(path: str = ".")`**
     *   Prints all files and folders in a directory.
 
-18. **`search_bing(query, num_results=10, lang="en")`**
-    *   Scrapes the Bing search engine.
-
 ### 🚀 Get Started:                                                                                       
 To begin your journey with Termux-AI-Free-Agent, simply run the install.sh, then run the `ai.py` script in your Termux environment.
 
