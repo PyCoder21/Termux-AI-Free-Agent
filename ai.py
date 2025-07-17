@@ -144,13 +144,25 @@ def create_llm_chain(
         )
     else:
         # Модель из конфига (по умолчанию)
-        llm = ChatOpenAI(
-            api_key=os.getenv("POLLINATIONS_API_TOKEN"),
-            model=config.get("model"),
-            streaming=True,
-            base_url=config.get("base_url"),
-            temperature=0.1,
-        )
+        if config.get("default_model") == "qwen":
+            llm = ChatOpenAI(
+                api_key="sk-",
+                model="Qwen/Qwen3-235B-A22B-fp8-tput",
+                streaming=True,
+                base_url="http://127.0.0.1:8000/v1",
+                temperature=0.1,
+            )
+        elif config.get("default_model") == "gpt":
+            llm = ChatOpenAI(
+                api_key="sk-",
+                model="gpt-4.5-preview",
+                streaming=True,
+                base_url="http://127.0.0.1:8000/v1",
+                temperature=0.1,
+            )
+        else:
+            print("set default model to qwen or gpt.")
+            sys.exit(1)
     # Системный промпт
     system_prompt = """
 Ты — AI ассистент в среде Termux. Твоя задача — помогать пользователю, выполняя задачи шаг за шагом.

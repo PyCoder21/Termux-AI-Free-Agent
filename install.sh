@@ -20,92 +20,37 @@ echo '############################################################'
 echo -e "${NC}"
 echo -e "${GREEN}Скрипт установки Termux-AI-Free-Agent${NC}\n"
 
-# --- Выбор режима установки ---
-echo -e "${YELLOW}Выберите режим установки:${NC}"
-echo "1) Только Pollinations API"
-echo "2) Только Termux-services (reverse proxy)"
-echo "3) Оба варианта"
-echo -e "${RED}4) Отмена${NC}"
 echo ""
 
-read -p "Введите номер выбора (1-4): " choice
-
-case $choice in
-    1)
-        echo -e "${GREEN}Выбран режим: Только Pollinations API${NC}"
-        pollinations_only=true
-        termux_services_only=false
-        ;;
-    2)
-        echo -e "${GREEN}Выбран режим: Только Termux-services${NC}"
-        pollinations_only=false
-        termux_services_only=true
-        ;;
-    3)
-        echo -e "${GREEN}Выбран режим: Оба варианта${NC}"
-        pollinations_only=false
-        termux_services_only=false
-        ;;
-    4)
-        echo -e "${RED}Установка отменена${NC}"
-        exit 0
-        ;;
-    *)
-        echo -e "${RED}Неверный выбор, выход${NC}"
-        exit 1
-        ;;
-esac
-
-echo ""
-
-# --- Установка Pollinations API ---
-if ! $termux_services_only; then
-    echo -e "${YELLOW}--- Шаг 1: Настройка Pollinations API ---${NC}"
-    if [ -z "$POLLINATIONS_API_TOKEN" ]; then
-        echo "Переменная POLLINATIONS_API_TOKEN не установлена."
-        read -p "Пожалуйста, введите ваш токен Pollinations: " token
-        # Используем printf для безопасной записи токена
-        printf "\nexport POLLINATIONS_API_TOKEN=%q\n" "$token" >> ~/.bashrc
-        echo -e "${GREEN}Токен добавлен в ~/.bashrc. Перезапустите терминал или выполните 'source ~/.bashrc'${NC}"
-        export POLLINATIONS_API_TOKEN="$token"
-    else
-        echo -e "${GREEN}Токен POLLINATIONS_API_TOKEN найден.${NC}"
-    fi
-    echo ""
+echo -e "${YELLOW}--- Шаг 2: Настройка Termux-services ---${NC}"
+if ! command -v sv &> /dev/null; then
+    echo "Утилита sv (termux-services) не найдена. Устанавливаю..."
+    pkg install termux-services -y
+    echo -e "${GREEN}termux-services успешно установлен.${NC}"
+else
+    echo -e "${GREEN}termux-services уже установлен.${NC}"
 fi
-
-# --- Установка Termux-services ---
-if ! $pollinations_only; then
-    echo -e "${YELLOW}--- Шаг 2: Настройка Termux-services ---${NC}"
-    if ! command -v sv &> /dev/null; then
-        echo "Утилита sv (termux-services) не найдена. Устанавливаю..."
-        pkg install termux-services -y
-        echo -e "${GREEN}termux-services успешно установлен.${NC}"
-    else
-        echo -e "${GREEN}termux-services уже установлен.${NC}"
-    fi
     
     # Создаем структуру папок для сервиса
-    if [ ! -d "$PREFIX/var/service" ]; then
-        mkdir -p "$PREFIX/var/service"
-    fi
+if [ ! -d "$PREFIX/var/service" ]; then
+    mkdir -p "$PREFIX/var/service"
+fi
     
     # Создаем сервис для gptchatbot
-    if [ ! -d "$PREFIX/var/service/gptchatbot" ]; then
-        mkdir -p "$PREFIX/var/service/gptchatbot"
-        echo "#!/usr/bin/bash" > "$PREFIX/var/service/gptchatbot/run"
-        echo "python ~/Termux-AI-Free-Agent/proxy.py" >> "$PREFIX/var/service/gptchatbot/run"
-        chmod +x "$PREFIX/var/service/gptchatbot/run"
-        sv-enable gptchatbot
-        echo -e "${GREEN}Сервис gptchatbot создан и включен.${NC}"
-    else
-        echo -e "${YELLOW}Сервис gptchatbot уже существует.${NC}"
-    fi
-
-    pkg install tur-repo python-torch python-torchaudio python-torchvision -y
-    pkg install python-tiktoken -y
-    echo ""
+if [ ! -d "$PREFIX/var/service/gptchatbot" ]; then
+    mkdir -p "$PREFIX/var/service/gptchatbot"
+    echo "#!/usr/bin/bash" > "$PREFIX/var/service/gptchatbot/run"
+    echo "python ~/Termux-AI-Free-Agent/proxy.py" >> "$PREFIX/var/service/gptchatbot/run"
+    chmod +x "$PREFIX/var/service/gptchatbot/run"
+    sv-enable gptchatbot
+    echo -e "${GREEN}Сервис gptchatbot создан и включен.${NC}"
+else
+    echo -e "${YELLOW}Сервис gptchatbot уже существует.${NC}"
 fi
+
+pkg install tur-repo python-torch python-torchaudio python-torchvision -y
+pkg install python-tiktoken -y
+echo ""
 
 # --- Общие зависимости ---
 echo -e "${YELLOW}--- Шаг 3: Установка общих зависимостей ---${NC}"
