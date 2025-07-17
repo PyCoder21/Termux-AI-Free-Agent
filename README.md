@@ -1,4 +1,4 @@
-# 🚀 FreeSeekR1-Agent: Your Autonomous AI Assistant for Termux 📱 + 🐳 + 🦜 = 🔥
+# 🚀 Termux-AI-Free-Agent: Your Autonomous AI Assistant for Termux 📱 + 🐳 + 🦜 = 🔥
 
 ## Asciinema Demo:
 
@@ -6,24 +6,24 @@
 
 ## Unleash the Power of AI, Totally free and Recursively! ✨
 
-FreeSeekR1-Agent is a cutting-edge LangChain 🦜 AI assistant designed to operate seamlessly within your Termux environment. This intelligent agent is built to tackle a wide array of tasks by **recursively answering and executing function calls until your objective is fully achieved!** Say goodbye to manual intervention and let FreeSeekR1-Agent drive your productivity.
+Termux-AI-Free-Agent is a cutting-edge LangChain 🦜 AI assistant designed to operate seamlessly within your Termux environment. This intelligent agent is built to tackle a wide array of tasks by **recursively answering and executing function calls until your objective is fully achieved!** Say goodbye to manual intervention and let Termux-AI-Free-Agent drive your productivity.
 
 ### 🖥️ NEW!!!:
 
 - **Now you can use the qwen version without api keys!!!**
-- **Run interactive commands:** FreeSeekR1-Agent now can run fully interactive commands using pexpect!!!
-- **Context compression:** If your context is full, you can use the `/compress` command to replace the dialog history with a detailed summary by DeepSeek.
+- **Run interactive commands:** Termux-AI-Free-Agent now can run fully interactive commands using pexpect!!!
+- **Context compression:** If your context is full, you can use the `/compress` command to replace the dialog history with a detailed summary.
 - **Context fullness indicator:** At the end of each response, there is an indicator showing the percentage of context fullness.
 
 ### 🌟 Key Features:                                                                                      
 -   **Autonomous Execution:** The agent intelligently breaks down complex tasks and executes a series of tool calls, iterating until the goal is met.
 -   **Recursive Problem Solving:** It's designed to think, act, and refine its approach through multiple iterations of tool usage and response generation.
--   **Zero cost!** 🎉 Unlike many AI solutions, FreeSeekR1-Agent is designed to be incredibly accessible. It leverages powerful, **zero-cost** tools like DeepSeek API (via `ChatOpenAI` with a compatible `base_url`) and various LangChain Community tools, meaning you can get started without the need for cumbersome API registrations or hidden costs.
--   **Rich Toolset:** Equipped with a diverse set of tools, FreeSeekR1-Agent can interact with your system, fetch information from the web, perform calculations, and much more.
+-   **Zero cost!** 🎉 Unlike many AI solutions, Termux-AI-Free-Agent is designed to be incredibly accessible. It leverages powerful, **zero-cost** tools like various LangChain Community tools, meaning you can get started without the need for cumbersome API registrations or hidden costs.
+-   **Rich Toolset:** Equipped with a diverse set of tools, Termux-AI-Free-Agent can interact with your system, fetch information from the web, perform calculations, and much more.
 -   **Termux Optimized:** Tailored for the Termux environment, ensuring smooth operation and compatibility with your mobile Linux setup.
 
 ### 🛠️ Tools at Your Command:                                                                              
-FreeSeekR1-Agent can work with files, execute interactive commands, search in DuckDuckgo, Wikipedia, WikiData, and StackOverflow, get the values of expressions, solve equations, get the weather, get the content of web pages, get the weather, open an URL on your phone, ask additional questions, and even generate images.
+Termux-AI-Free-Agent can work with files, execute interactive commands, search in DuckDuckgo, Wikipedia, WikiData, and StackOverflow, get the values of expressions, solve equations, get the weather, get the content of web pages, get the weather, open an URL on your phone, ask additional questions, and even generate images.
 
 Here is the complete tool list:
 
@@ -76,7 +76,7 @@ Here is the complete tool list:
     *   Ask an additional question.
 
 ### 🚀 Get Started:                                                                                       
-To begin your journey with FreeSeekR1-Agent, simplyrun the install.sh, then run the `ai.py` script in your Termux environment.
+To begin your journey with Termux-AI-Free-Agent, simply run the install.sh, then run the `ai.py` script in your Termux environment.
 
 **Install :**
 ```bash
@@ -88,7 +88,7 @@ bash install.sh
 python ai.py
 ```
 
-FreeSeekR1-Agent also has a non-interactive mode :
+Termux-AI-Free-Agent also has a non-interactive mode :
 
 ```bash
 python ai.py "What is the weather in Paris today?"

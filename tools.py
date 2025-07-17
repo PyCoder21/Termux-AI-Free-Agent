@@ -166,7 +166,7 @@ def get_git_repo(url: str) -> str:
     try:
         subprocess.run(["git", "clone", url, repo_dir], check=True, capture_output=True, text=True)
         
-        repo2txt_path = os.path.expanduser("~/FreeSeekR1-Agent/repo2txt.py")
+        repo2txt_path = os.path.expanduser("~/Termux-AI-Free-Agent/repo2txt.py")
         if not os.path.exists(repo2txt_path):
             urllib.request.urlretrieve(
                 "https://github.com/pde-rent/repo2txt/blob/main/main.py",

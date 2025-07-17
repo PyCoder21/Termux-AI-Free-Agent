@@ -18,7 +18,7 @@ echo '#                  У С Т А Н О В К А                       #'
 echo '#                                                          #'
 echo '############################################################'
 echo -e "${NC}"
-echo -e "${GREEN}Скрипт установки FreeSeekR1-Agent${NC}\n"
+echo -e "${GREEN}Скрипт установки Termux-AI-Free-Agent${NC}\n"
 
 # --- Выбор режима установки ---
 echo -e "${YELLOW}Выберите режим установки:${NC}"
@@ -94,7 +94,7 @@ if ! $pollinations_only; then
     if [ ! -d "$PREFIX/var/service/gptchatbot" ]; then
         mkdir -p "$PREFIX/var/service/gptchatbot"
         echo "#!/usr/bin/bash" > "$PREFIX/var/service/gptchatbot/run"
-        echo "python ~/FreeSeekR1-Agent/proxy.py" >> "$PREFIX/var/service/gptchatbot/run"
+        echo "python ~/Termux-AI-Free-Agent/proxy.py" >> "$PREFIX/var/service/gptchatbot/run"
         chmod +x "$PREFIX/var/service/gptchatbot/run"
         sv-enable gptchatbot
         echo -e "${GREEN}Сервис gptchatbot создан и включен.${NC}"
