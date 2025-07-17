@@ -178,10 +178,11 @@ def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
 
     # Создаем временную модель без потоковой передачи для сжатия
     compressor_llm = ChatOpenAI(
-        api_key=os.getenv("POLLINATIONS_API_TOKEN"),
-        model=config.get("model"),
-        base_url=config.get("base_url"),
-        temperature=0.0 # Минимальная температура для предсказуемого результата
+        api_key="sk-",
+        model="gpt-4.5-preview",
+        streaming=True,
+        base_url="http://127.0.0.1:8000/v1",
+        temperature=0.1,
     )
 
     # Промпт для сжатия
