@@ -2,6 +2,8 @@
 tools.py
 This is the file with the tools of the AI Agent.
 """
+from bs4 import BeautifulSoup
+from urllib.parse import quote_plus
 from io import BytesIO
 import urllib.request
 import math
@@ -264,6 +266,54 @@ def ls(path = "."):
 
     except Exception as e:
         return {"error": f"Could not list directory '{path}': {e}"}
+
+def search_bing(query, num_results=10, lang="en"):
+    """
+    Парсит результаты поиска Bing без использования search-engine-parser.
+    Возвращает список словарей с title, link и description.
+
+    Args:
+        query (str): Поисковый запрос
+        num_results (int): Сколько результатов вернуть (по умолчанию 10)
+        lang (str): Язык поиска (например, "en", "ru")
+
+    Returns:
+        list: [{"title": "...", "link": "...", "description": "..."}, ...]
+    """
+    # Заголовки, чтобы Bing не блокировал запрос
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+
+    # Кодируем запрос для URL
+    encoded_query = quote_plus(query)
+    url = f"https://www.bing.com/search?q={encoded_query}&count={num_results}&setlang={lang}"
+
+    # Отправляем GET-запрос
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()  # Проверка на ошибки
+
+    # Парсим HTML с помощью BeautifulSoup
+    soup = BeautifulSoup(response.text, 'html.parser')
+    results = []
+
+    # Ищем все элементы с результатами (Bing использует класс 'b_algo')
+    for item in soup.find_all('li', class_='b_algo'):
+        title_elem = item.find('h2')
+        link_elem = title_elem.find('a') if title_elem else None
+        desc_elem = item.find('div', class_='b_caption').find('p') if item.find('div', class_='b_caption') else None
+
+        if title_elem and link_elem:
+            results.append({
+                "title": title_elem.get_text(strip=True),
+                "link": link_elem.get('href', ''),
+                "description": desc_elem.get_text(strip=True) if desc_elem else ""
+            })
+
+        if len(results) >= num_results:
+            break
+
+    return results
 
 def get_tools() -> List[Any]:
     """Возвращает список всех инструментов LangChain."""
