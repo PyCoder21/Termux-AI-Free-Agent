@@ -121,48 +121,34 @@ def create_llm_chain(
     is_interactive_mode: bool,
     *,
     use_gpt: bool = False,
-    use_qwen: bool = False
+    use_qwen: bool = False,
+    use_gemini: bool = False
 ) -> Any:
     """Создает цепочку LLM с инструментами."""
     if use_qwen:
-        # Настройки для Qwen
-        llm = ChatOpenAI(
-            api_key="sk-",
-            model="Qwen/Qwen3-235B-A22B-fp8-tput",
-            streaming=True,
-            base_url="http://127.0.0.1:8000/v1",
-            temperature=0.1,
-        )
+        mo = "Qwen/Qwen3-235B-A22B-fp8-tput"
     elif use_gpt:
-        # Настройки для ChatGPT
-        llm = ChatOpenAI(
-            api_key="sk-",
-            model="gpt-4.5-preview",
-            streaming=True,
-            base_url="http://127.0.0.1:8000/v1",
-            temperature=0.1,
-        )
+        mo = "gpt-4.5-preview"
+    elif use_gemini:
+        mo = "google/gemini-2.5-pro-preview-05-06"
     else:
         # Модель из конфига (по умолчанию)
         if config.get("default_model") == "qwen":
-            llm = ChatOpenAI(
-                api_key="sk-",
-                model="Qwen/Qwen3-235B-A22B-fp8-tput",
-                streaming=True,
-                base_url="http://127.0.0.1:8000/v1",
-                temperature=0.1,
-            )
+            mo = "Qwen/Qwen3-235B-A22B-fp8-tput"
         elif config.get("default_model") == "gpt":
-            llm = ChatOpenAI(
-                api_key="sk-",
-                model="gpt-4.5-preview",
-                streaming=True,
-                base_url="http://127.0.0.1:8000/v1",
-                temperature=0.1,
-            )
+            mo = "gpt-4.5-preview"
+        elif config.get("default_model") == "gemini-2.5-pro":
+            mo = "google/gemini-2.5-pro-preview-05-06"
         else:
-            print("set default model to qwen or gpt.")
+            print("set default model to qwen, gpt or gemini-2.5-pro.")
             sys.exit(1)
+    llm = ChatOpenAI(
+        api_key="sk-",
+        model=mo,
+        streaming=True,
+        base_url="http://127.0.0.1:8000/v1",
+        temperature=0.1,
+    )
     # Системный промпт
     system_prompt = """
 Ты — AI ассистент в среде Termux. Твоя задача — помогать пользователю, выполняя задачи шаг за шагом.
@@ -228,6 +214,7 @@ def main():
     parser.add_argument('query', nargs='*', help='Запрос для неинтерактивного режима')
     parser.add_argument('--gpt', action='store_true', help='Использовать OpenAI GPT')
     parser.add_argument('--qwen', action='store_true', help='Использовать Qwen')
+    parser.add_argument('--gemini', action='store_true', help='Использовать Gemini')
     args = parser.parse_args()
 
     is_interactive_mode = not args.query
@@ -257,7 +244,8 @@ def main():
         tools,
         is_interactive_mode,
         use_gpt=args.gpt,
-        use_qwen=args.qwen
+        use_qwen=args.qwen,
+        use_gemini=args.gemini
     )
     chat_history = []
     last_prompt_tokens = 0
