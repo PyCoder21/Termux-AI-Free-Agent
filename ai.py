@@ -123,7 +123,8 @@ def create_llm_chain(
     use_gpt: bool = False,
     use_qwen: bool = False,
     use_gemini: bool = False,
-    use_deepseek: bool = False
+    use_deepseek: bool = False,
+    use_kimi: bool = False
 ) -> Any:
     use_together = False
     """Создает цепочку LLM с инструментами."""
@@ -136,6 +137,9 @@ def create_llm_chain(
     elif use_deepseek:
         mo = "deepseek-ai/DeepSeek-V3"
         use_together = True
+    elif use_kimi:
+        mo = "moonshotai/Kimi-K2-Instruct"
+        use_together = True
     else:
         # Модель из конфига (по умолчанию)
         if config.get("default_model") == "qwen":
@@ -147,8 +151,11 @@ def create_llm_chain(
         elif config.get("default_model") == "deepseek-v3":
             mo = "deepseek-ai/DeepSeek-V3"
             use_together = True
+        elif config.get("default_model") == "kimi-k2":
+            mo = "moonshotai/Kimi-K2-Instruct"
+            use_together = True
         else:
-            print("set default model to qwen, gpt, gemini-2.5-pro or deepseek-v3.")
+            print("set default model to qwen, gpt, gemini-2.5-pro, deepseek-v3 or kimi-k2.")
             sys.exit(1)
     if use_together:
         llm = ChatOpenAI(
@@ -167,8 +174,8 @@ def create_llm_chain(
             temperature=0.1,
         )
     # Системный промпт
-    system_prompt = """
-Ты — AI ассистент в среде Termux. Твоя задача — помогать пользователю, выполняя задачи шаг за шагом.
+    system_prompt = f"""
+Ты — AI ассистент в среде Termux. Ты используешь ИИ модель {mo}. Твоя задача — помогать пользователю, выполняя задачи шаг за шагом.
 - **Один инструмент за раз:** В каждом ответе вызывай не более ОДНОГО инструмента.
 - **Последовательность:** Работай по циклу: "ответ -> вызов инструмента -> новый ответ -> вызов инструмента...", пока задача не будет полностью решена.
 - **Точность:** Будь предельно точным при работе с файлами и командами.
@@ -234,6 +241,7 @@ def main():
     parser.add_argument('--qwen', action='store_true', help='Использовать Qwen')
     parser.add_argument('--gemini', action='store_true', help='Использовать Gemini')
     parser.add_argument('--deepseek', action='store_true', help='Использовать DeepSeek-V3')
+    parser.add_argument('--kimi', action='store_true', help='Использовать Kimi-K2 (1 триллион параметров!)')
     args = parser.parse_args()
 
     is_interactive_mode = not args.query
@@ -265,7 +273,8 @@ def main():
         use_gpt=args.gpt,
         use_qwen=args.qwen,
         use_gemini=args.gemini,
-        use_deepseek=args.deepseek
+        use_deepseek=args.deepseek,
+        use_kimi=args.kimi
     )
     chat_history = []
     last_prompt_tokens = 0
