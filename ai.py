@@ -23,6 +23,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.markup import escape
+from rich.text import Text
+from rich.console import Group
 from tools import get_tools
 
 # ==============================================================================
@@ -68,10 +70,17 @@ def display_tool_call(tool_call: Dict[str, Any]):
     """Красиво отображает вызов инструмента."""
     tool_name = tool_call['name']
     tool_args = tool_call['args']
-    panel_content = f"[bold]Инструмент:[/][cyan]{tool_name}[/][bold]Аргументы:[/]"
+    
+    # Создаем элементы для отображения
+    header = Text.from_markup(f"[bold]Инструмент:[/] [cyan]{tool_name}[/]\n[bold]Аргументы:[/]\n")
     args_str = json.dumps(tool_args, indent=2, ensure_ascii=False)
-    panel_content += str(Syntax(args_str, "json", theme="monokai", line_numbers=True))
-    console.print(Panel(panel_content, title="[yellow]Вызов инструмента", border_style="yellow"))
+    syntax = Syntax(args_str, "json", theme="monokai", line_numbers=True)
+
+    # Создаем группу элементов для отображения
+    content = Group(header, syntax)
+
+    # Печатаем панель
+    console.print(Panel(content, title="[yellow]Вызов инструмента", border_style="yellow"))
 
 def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[ToolMessage]:
     """Выполняет вызовы инструментов и возвращает результаты."""
@@ -84,7 +93,7 @@ def process_tool_calls(tool_calls: List[Dict[str, Any]], tools: List) -> List[To
             try:
                 result = func.invoke(tool_call['args'])
                 console.print(Panel(
-                    f"[bold green]Результат '{tool_call['name']}':[/]{escape(str(result))}",
+                    f"[bold green]'{tool_call['name']}' : [/]{escape(str(result))}",
                     border_style="green",
                     title="[green]Результат"
                 ))
