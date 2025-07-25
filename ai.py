@@ -321,13 +321,9 @@ def main():
                     break
                 console.print(f"[bold green]Запрос:[/][cyan] {user_input}[/]")
                 initial_query = None 
-
-            console.print("-" * 50)
             chat_history.append(HumanMessage(content=user_input))
             max_iterations = 50
             for i in range(max_iterations):
-                console.print(f"[bold yellow]Итерация {i+1}/{max_iterations}...[/]")
-                
                 try:
                     response = chain.invoke(
                         {"messages": chat_history},
