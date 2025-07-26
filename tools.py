@@ -2,6 +2,7 @@
 tools.py
 This is the file with the tools of the AI Agent.
 """
+import shutil
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus
 from io import BytesIO
@@ -23,6 +24,7 @@ from langchain_community.utilities import (
 from langchain_community.utilities.wikidata import WikidataAPIWrapper
 from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.tools.wikidata.tool import WikidataQueryRun
+from langchain_community.document_loaders import GitLoader
 
 # Инициализация оберток API
 _wikidata_wrapper = WikidataAPIWrapper(top_k_results=10, max_response_length=4000)
@@ -163,37 +165,17 @@ def scrape_webpage(url: str) -> str:
 
 def get_git_repo(url: str) -> str:
     """Клонирует Git-репозиторий и извлекает его содержимое."""
-    repo_dir = "temp_git_repo"
-    output_file = "repo_content.txt"
+    repo_dir = "./temp_git_repo"
     try:
-        subprocess.run(["git", "clone", url, repo_dir], check=True, capture_output=True, text=True)
-        
-        repo2txt_path = os.path.expanduser("~/Termux-AI-Free-Agent/repo2txt.py")
-        if not os.path.exists(repo2txt_path):
-            urllib.request.urlretrieve(
-                "https://github.com/pde-rent/repo2txt/blob/main/main.py",
-                repo2txt_path
-            )
-            
-        subprocess.run(
-            ["python", repo2txt_path, "-d", repo_dir, "-o", output_file],
-            check=True, capture_output=True, text=True
+        loader = GitLoader(
+            clone_url=url,
+            repo_path=repo_dir,
         )
-        
-        with open(output_file, "r", encoding="utf-8") as f:
-            content = f.read()
-            
-        return content
-    except subprocess.CalledProcessError as e:
-        return f"Ошибка при работе с Git: {e.stderr}"
+        data = loader.load()
+        shutil.rmtree(repo_dir)
+        return data
     except Exception as e:
         return f"Непредвиденная ошибка: {str(e)}"
-    finally:
-        if os.path.isdir(repo_dir):
-            subprocess.run(["rm", "-rf", repo_dir])
-        if os.path.exists(output_file):
-            os.remove(output_file)
-
 def query_wikidata(query: str) -> str:
     """Ищет данные в Wikidata по запросу."""
     try:

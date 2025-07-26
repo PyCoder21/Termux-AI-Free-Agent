@@ -179,7 +179,7 @@ def create_llm_chain(
             api_key = "sk-",
             model=mo,
             streaming=True,
-            base_url="http://127.0.0.1:8000/v1",
+            base_url="http://127.0.0.1:61252/v1",
             temperature=0.1,
         )
     # Системный промпт
@@ -216,7 +216,7 @@ def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
         api_key="sk-",
         model="gpt-4.5-preview",
         streaming=True,
-        base_url="http://127.0.0.1:8000/v1",
+        base_url="http://127.0.0.1:61252/v1",
         temperature=0.1,
     )
 
