@@ -136,6 +136,8 @@ def create_llm_chain(
     use_kimi: bool = False
 ) -> Any:
     use_together = False
+
+    global mo
     """Создает цепочку LLM с инструментами."""
     if use_qwen:
         mo = "Qwen/Qwen3-235B-A22B-fp8-tput"
@@ -289,7 +291,7 @@ def main():
     )
     chat_history = []
     last_prompt_tokens = 0
-
+    console.log("Model:", mo)
     while True:
         try:
             if is_interactive_mode:
