@@ -32,7 +32,7 @@ from tools import get_tools
 # ==============================================================================
 
 
-console = Console()
+console = Console(log_path=False)
 
 
 def load_config() -> Dict[str, Any]:
