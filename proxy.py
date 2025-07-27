@@ -6,8 +6,7 @@ from typing import AsyncGenerator
 
 app = FastAPI()
 
-TARGET_API = "https://gpt-chatbotru-chat1.ru/api/openai/v1/chat/completions"
-MODELS_LIST_API = "https://gpt-chatbotru-chat1.ru/api/openai/v1/models"
+TARGET_API = "https://gpt-chatbotru-chat1.ru/api/openai/v1"
 
 REQUIRED_HEADERS = {
     # Ваши 14 обязательных заголовков
@@ -31,7 +30,7 @@ async def stream_generator(client: httpx.AsyncClient, request_data: dict) -> Asy
     """Потоковый генератор, который не буферизирует данные"""
     async with client.stream(
         "POST",
-        TARGET_API,
+        TARGET_API + "/chat/completions",
         json=request_data,
         headers=REQUIRED_HEADERS,
         timeout=None
@@ -47,7 +46,7 @@ async def proxy_request(request: Request):
     if not is_stream:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                TARGET_API,
+                TARGET_API + "/chat/completions",
                 json=request_data,
                 headers=REQUIRED_HEADERS
             )
@@ -64,11 +63,22 @@ async def proxy_request(request: Request):
         media_type="text/event-stream"
     )
 
+@app.post("/v1/images/generations")
+async def image_request(request: Request):  
+    request_data = await request.json()
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            TARGET_API + "/images/generations",
+            json=request_data,
+            headers=REQUIRED_HEADERS
+        )
+        return response.json()
+
 @app.get("/v1/models")
 async def models_list():  # Сделаем функцию асинхронной
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            MODELS_LIST_API,
+            TARGET_API + "/models",
             headers=REQUIRED_HEADERS
         )
         return response.json()
