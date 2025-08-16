@@ -142,7 +142,7 @@ def create_llm_chain(
     if use_qwen:
         mo = "Qwen/Qwen3-235B-A22B-fp8-tput"
     elif use_gpt:
-        mo = "gpt-4.5-preview"
+        mo = "gpt-5"
     elif use_gemini:
         mo = "google/gemini-2.5-pro-preview-05-06"
     elif use_deepseek:
@@ -156,7 +156,7 @@ def create_llm_chain(
         if config.get("default_model") == "qwen":
             mo = "Qwen/Qwen3-235B-A22B-fp8-tput"
         elif config.get("default_model") == "gpt":
-            mo = "gpt-4.5-preview"
+            mo = "gpt-5"
         elif config.get("default_model") == "gemini-2.5-pro":
             mo = "google/gemini-2.5-pro-preview-05-06"
         elif config.get("default_model") == "deepseek-v3":
@@ -216,7 +216,7 @@ def compress_chat_history(chat_history: List, config: Dict[str, Any]) -> List:
     # Создаем временную модель без потоковой передачи для сжатия
     compressor_llm = ChatOpenAI(
         api_key="sk-",
-        model="gpt-4.5-preview",
+        model="gpt-5",
         streaming=True,
         base_url="http://127.0.0.1:61252/v1",
         temperature=0.1,
